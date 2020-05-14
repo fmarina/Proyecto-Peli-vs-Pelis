@@ -1,4 +1,4 @@
-const connection = require('../conexiondb');
+const connection = require('../lib/conexiondb');
 
 const controller = {
     listarCompetencias : function(req, res) {
