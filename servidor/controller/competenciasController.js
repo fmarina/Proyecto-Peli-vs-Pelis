@@ -26,7 +26,10 @@ const controller = {
 
             if(err) return res.status(404).send("Hubo un error en la consulta obtenerPeliculasAleatorias");
             
-            if(competenciaResult.length === 0) return res.status(404).send("Error. La competencia con el identificador enviado no existe.");            
+            if(competenciaResult.length === 0) {
+                console.log("No se encontro ninguna competencia con ese id");
+                return res.status(404).send("No se encontro ninguna competencia con ese id");
+            } 
             
             const sql = "SELECT id, poster, titulo FROM pelicula ORDER BY RAND() LIMIT 2;";
 
@@ -34,8 +37,8 @@ const controller = {
                 if(err) return res.status(404).send("Hubo un error en la consulta obtenerPeliculasAleatorias");
 
                 const result = {
-                    'peliculas'   : peliculaResult,             // [{id, poster, titulo}, {id, poster, titulo}]
-                    'competencia' : competenciaResult[0].nombre // [{id, nombre}]
+                    'peliculas'   : peliculaResult,
+                    'competencia' : competenciaResult[0].nombre
                 }
 
                 res.send(JSON.stringify(result));
@@ -43,10 +46,11 @@ const controller = {
         });
     },
 
+
     votar: function (req, res) {
 
-        let competencia_id = req.params.id;
-        let pelicula_id = req.body.idPelicula;
+        const competencia_id = req.params.id;
+        const pelicula_id = req.body.idPelicula;
 
         const sql = "INSERT INTO voto (competencia_id, pelicula_id) VALUES (?,?)";
 
@@ -60,9 +64,54 @@ const controller = {
             } 
 
             res.send(JSON.stringify(results));
-        });       
-
+        }); 
     },
+
+
+    obtenerResultados: function(req, res) {
+
+        const competencia_id = req.params.id;
+        const sql = "SELECT * FROM competencia WHERE id = " + competencia_id; 
+        
+        connection.query(sql, function(err, competenciaResult) {
+            if(err) {
+                console.log("Error en id competencia", err.message);
+                return res.status(404).send("Hubo un error en la consulta del id de competencia");
+            }
+
+            if(competenciaResult.length == 0){
+                console.log("No se encontro ninguna competencia con ese id");
+                return res.status(404).send("No se encontro ninguna competencia con ese id");
+            }
+
+            const sql = "SELECT voto.pelicula_id, poster, titulo, COUNT(pelicula_id) AS votos " +
+                        "FROM voto " +
+                        "JOIN pelicula ON pelicula_id = pelicula.id " +
+                        "WHERE voto.competencia_id = " + competencia_id + " " +
+                        "GROUP BY pelicula_id " +
+                        "ORDER BY votos desc " +
+                        "LIMIT 3";
+
+            connection.query(sql, function(err, peliculaResults) {
+                if(err) {
+                    console.log("Error en la consulta de pelicula", err.message);
+                    return res.status(404).send("Hubo un error en la consulta de peliculas resultados");
+                }
+
+                const resultado = {
+                    'competencia' : competenciaResult[0].nombre,
+                    'resultados'    : peliculaResults
+                };
+    
+                res.send(JSON.stringify(resultado));
+
+            });            
+
+        });
+    },
+
+
+    
 }
 
 
