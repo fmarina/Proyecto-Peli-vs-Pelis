@@ -31,17 +31,37 @@ const controller = {
             const sql = "SELECT id, poster, titulo FROM pelicula ORDER BY RAND() LIMIT 2;";
 
             connection.query(sql, function(err, peliculaResult) {
-
                 if(err) return res.status(404).send("Hubo un error en la consulta obtenerPeliculasAleatorias");
-                
+
                 const result = {
-                    'peliculas'   : peliculaResult,    // [{id, poster, titulo}, {id, poster, titulo}]
-                    'competencia' : competenciaResult[0]  // [{id, nombre}]
+                    'peliculas'   : peliculaResult,             // [{id, poster, titulo}, {id, poster, titulo}]
+                    'competencia' : competenciaResult[0].nombre // [{id, nombre}]
                 }
 
                 res.send(JSON.stringify(result));
             });
         });
+    },
+
+    votar: function (req, res) {
+
+        let competencia_id = req.params.id;
+        let pelicula_id = req.body.idPelicula;
+
+        const sql = "INSERT INTO voto (competencia_id, pelicula_id) VALUES (?,?)";
+
+        if(!pelicula_id) return res.status(404).send("Hubo un error con pelicula_id");
+
+        connection.query(sql, [competencia_id, pelicula_id], function(err, results) {            
+            
+            if(err) {
+                console.log("Hubo un error en el insert voto", err.message);
+                return res.status(404).send("Hubo un error al tratar de insertar el voto");
+            } 
+
+            res.send(JSON.stringify(results));
+        });       
+
     },
 }
 
