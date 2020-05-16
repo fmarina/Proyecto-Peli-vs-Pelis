@@ -8,6 +8,9 @@ CREATE TABLE `competencia` (
   PRIMARY KEY (`id`)
 )
 
+ALTER TABLE competencia ADD COLUMN genero_id INT(11) unsigned;
+ALTER TABLE competencia ADD FOREIGN KEY (genero_id) REFERENCES genero (id);
+
 
 DROP TABLE IF EXISTS `voto`;
 
