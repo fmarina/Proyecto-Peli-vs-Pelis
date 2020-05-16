@@ -7,4 +7,5 @@ module.exports = function(app){
     app.get('/competencias/:id/resultados', competenciaController.obtenerResultados);
     app.post('/competencias', competenciaController.crearNuevaCompetencia);
     app.delete('/competencias/:id/votos', competenciaController.eliminarVotos);
+    app.get('/generos', competenciaController.cargarGeneros);
 }
