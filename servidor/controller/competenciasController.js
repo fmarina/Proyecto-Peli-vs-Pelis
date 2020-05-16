@@ -111,6 +111,33 @@ const controller = {
     },
 
 
+    crearNuevaCompetencia: function(req, res) {
+
+        let nombre = req.body.nombre;
+        const sql = "SELECT nombre FROM competencia where nombre = '" + nombre + "'";
+
+        if(!nombre) return res.status(404).send("Error. Debe ingresar un nombre de competencia");
+        
+        connection.query(sql, function(err, resultNombre) {
+            if(err) {
+                console.log("Error en la consulta de competencias segun el nombre", err.message);
+                return res.status(404).send("Hubo un error en la consulta de competencias segun nombre");
+            }
+
+            if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
+
+            const sql1 = "INSERT INTO competencia (nombre) VALUES (?)";
+
+            connection.query(sql1, [nombre], function(err, result) {
+                if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
+                
+                res.send(JSON.stringify(result));
+            });
+
+        });
+    },
+
+
     
 }
 
