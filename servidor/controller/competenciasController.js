@@ -113,10 +113,12 @@ const controller = {
 
     crearNuevaCompetencia: function(req, res) {
 
-        let nombre = req.body.nombre;
-        const sql = "SELECT nombre FROM competencia where nombre = '" + nombre + "'";
+        const nombre = req.body.nombre;
+        const genero_id = req.body.genero_id !== '' ? req.body.genero_id : null;
 
         if(!nombre) return res.status(404).send("Error. Debe ingresar un nombre de competencia");
+
+        const sql = "SELECT nombre FROM competencia where nombre = '" + nombre + "'";        
         
         connection.query(sql, function(err, resultNombre) {
             if(err) {
@@ -125,10 +127,10 @@ const controller = {
             }
 
             if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
+            
+            const sql = "INSERT INTO competencia (nombre, genero_id) VALUES (?,?);";
 
-            const sql = "INSERT INTO competencia (nombre) VALUES (?)";
-
-            connection.query(sql, [nombre], function(err, result) {
+            connection.query(sql, [nombre, genero_id], function(err, result) {
                 if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
                 
                 res.send(JSON.stringify(result));
@@ -178,7 +180,7 @@ const controller = {
     },
 
 
-    
+
 }
 
 
