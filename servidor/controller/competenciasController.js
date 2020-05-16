@@ -163,6 +163,21 @@ const controller = {
     },
 
 
+    cargarGeneros: function(req, res) {
+
+        const sql = "SELECT * FROM genero";
+        connection.query(sql, function(err, results) {
+
+            if(err) {
+                console.log("Error en la consulta generos", err.message);
+                return res.status(404).send("Hubo un error en la consulta generos");
+            }
+
+            res.send(JSON.stringify(results));
+        });
+    },
+
+
     
 }
 
