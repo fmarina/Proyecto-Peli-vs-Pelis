@@ -126,14 +126,39 @@ const controller = {
 
             if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
 
-            const sql1 = "INSERT INTO competencia (nombre) VALUES (?)";
+            const sql = "INSERT INTO competencia (nombre) VALUES (?)";
 
-            connection.query(sql1, [nombre], function(err, result) {
+            connection.query(sql, [nombre], function(err, result) {
                 if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
                 
                 res.send(JSON.stringify(result));
             });
 
+        });
+    },
+
+
+    eliminarVotos: function(req, res) {
+
+        const competencia_id = req.params.id;
+        const sql = "SELECT * FROM competencia WHERE id = " + competencia_id;
+        
+        connection.query(sql, function(err, competenciaResult) {
+
+            if(err) {
+                console.log("Error en la consulta competencias segun id", err.message);
+                return res.status(404).send("Hubo un error en la consulta competencias segun id");
+            }
+
+            if(competenciaResult.length === 0) return res.status(422).send("Error. No se encuentra ninguna competencia con ese id");
+
+            const sql = "DELETE FROM voto WHERE competencia_id = " + competencia_id;
+
+            connection.query(sql, function(err, deleteResult) {
+                if(err) return res.status(404).send("Hubo un error al intentar eliminar los votos de una competencia");
+
+                res.send(JSON.stringify(deleteResult));
+            });
         });
     },
 
