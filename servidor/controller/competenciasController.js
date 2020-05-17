@@ -122,9 +122,9 @@ const controller = {
     crearNuevaCompetencia: function(req, res) {
 
         const nombre = req.body.nombre;
-        const genero_id = req.body.genero_id !== '' ? req.body.genero_id : null;
 
         if(!nombre) return res.status(404).send("Error. Debe ingresar un nombre de competencia");
+        if(nombre.length < 3) return res.status(422).send("Error. El nombre de competencia debe ser mayor a 3 caracteres");
 
         const sql = "SELECT nombre FROM competencia where nombre = '" + nombre + "'";        
         
@@ -135,10 +135,13 @@ const controller = {
             }
 
             if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
-            
-            const sql = "INSERT INTO competencia (nombre, genero_id) VALUES (?,?);";
 
-            connection.query(sql, [nombre, genero_id], function(err, result) {
+            const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
+            const director_id = req.body.director !== '0' ? req.body.director : null;
+                        
+            const sql = "INSERT INTO competencia (nombre, genero_id, director_id) VALUES (?,?,?);";
+            
+            connection.query(sql, [nombre, genero_id, director_id], function(err, result) {
                 if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
                 
                 res.send(JSON.stringify(result));
@@ -201,7 +204,7 @@ const controller = {
     },
 
 
-    
+
 }
 
 
