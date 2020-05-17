@@ -128,30 +128,53 @@ const controller = {
 
         const nombre = req.body.nombre;
 
-        if(!nombre) return res.status(404).send("Error. Debe ingresar un nombre de competencia");
+        if(!nombre) return res.status(422).send("Error. Debe ingresar un nombre de competencia");
         if(nombre.length < 3) return res.status(422).send("Error. El nombre de competencia debe ser mayor a 3 caracteres");
 
-        const sql = "SELECT nombre FROM competencia where nombre = '" + nombre + "'";        
+        const sql = "SELECT * FROM competencia where nombre = '" + nombre + "'";   
+        
+        const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
+        const director_id = req.body.director !== '0' ? req.body.director : null;
         
         connection.query(sql, function(err, resultNombre) {
+
             if(err) {
                 console.log("Error en la consulta de competencias segun el nombre", err.message);
                 return res.status(404).send("Hubo un error en la consulta de competencias segun nombre");
             }
 
             if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
-
-            const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
-            const director_id = req.body.director !== '0' ? req.body.director : null;
-                        
-            const sql = "INSERT INTO competencia (nombre, genero_id, director_id) VALUES (?,?,?);";
             
-            connection.query(sql, [nombre, genero_id, director_id], function(err, result) {
-                if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
-                
-                res.send(JSON.stringify(result));
-            });
+            
+            let totalResultados = "SELECT count(*) as totalResultados " + 
+                                 "FROM pelicula " +
+                                 "JOIN director_pelicula ON pelicula_id = pelicula.id " +
+                                 "WHERE true = true";
+            
+            let genero   = genero_id   !== null ? " AND genero_id = "   + genero_id   : "";
+            let director = director_id !== null ? " AND director_id = " + director_id : "";
 
+            totalResultados = totalResultados + genero + director;
+
+            connection.query(totalResultados, function(err, totalResults) {
+
+                if(err) {
+                    console.log("Error en la consulta totalResultados", err.message);
+                    return res.status(404).send("Hubo un error en la consulta totalResultados");
+                }
+                
+                if(totalResults[0].totalResultados < 2) return res.status(422).send("No se puede crear la competencia. No hay al menos dos peliculas con el criterio elegido");
+
+                
+                const sql = "INSERT INTO competencia (nombre, genero_id, director_id) VALUES (?,?,?);";
+                
+                connection.query(sql, [nombre, genero_id, director_id], function(err, result) {
+                    if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
+                    
+                    res.send(JSON.stringify(result));
+                });
+
+            });
         });
     },
 
