@@ -135,6 +135,7 @@ const controller = {
         
         const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
         const director_id = req.body.director !== '0' ? req.body.director : null;
+        const actor_id    = req.body.actor    !== '0' ? req.body.actor    : null;
         
         connection.query(sql, function(err, resultNombre) {
 
@@ -149,13 +150,15 @@ const controller = {
             let totalResultados = "SELECT count(*) as totalResultados " + 
                                  "FROM pelicula " +
                                  "JOIN director_pelicula ON pelicula_id = pelicula.id " +
+                                 "JOIN actor_pelicula ON actor_pelicula.pelicula_id = pelicula.id " +
                                  "WHERE true = true";
             
             let genero   = genero_id   !== null ? " AND genero_id = "   + genero_id   : "";
             let director = director_id !== null ? " AND director_id = " + director_id : "";
+            let actor    = actor_id    !== null ? " AND actor_id = "    + actor_id    : "";
 
-            totalResultados = totalResultados + genero + director;
-
+            totalResultados = totalResultados + genero + director + actor;
+            
             connection.query(totalResultados, function(err, totalResults) {
 
                 if(err) {
@@ -166,9 +169,9 @@ const controller = {
                 if(totalResults[0].totalResultados < 2) return res.status(422).send("No se puede crear la competencia. No hay al menos dos peliculas con el criterio elegido");
 
                 
-                const sql = "INSERT INTO competencia (nombre, genero_id, director_id) VALUES (?,?,?);";
+                const sql = "INSERT INTO competencia (nombre, genero_id, director_id, actor_id) VALUES (?,?,?,?);";
                 
-                connection.query(sql, [nombre, genero_id, director_id], function(err, result) {
+                connection.query(sql, [nombre, genero_id, director_id, actor_id], function(err, result) {
                     if(err) return res.status(404).send("Hubo un error en el insert de nueva competencia");
                     
                     res.send(JSON.stringify(result));
@@ -245,7 +248,7 @@ const controller = {
     }
 
 
-    
+
 }
 
 
