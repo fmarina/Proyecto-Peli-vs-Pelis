@@ -247,10 +247,42 @@ const controller = {
 
             res.send(JSON.stringify(results));
         });
-    }
+    },
 
 
+    eliminarCompetencia: function(req, res) {
 
+        const competencia_id = req.params.id;
+        const sql = "SELECT * FROM competencia WHERE id = " + competencia_id;
+
+        connection.query(sql, function(err, result) {
+
+            if(err) return res.status(404).send("Hubo un error en la consulta competencias segun id");
+
+            if(result.length === 0) return res.status(404).send("Error. No se encuentra ninguna competencia con ese id");
+
+            const sql = "DELETE FROM voto WHERE competencia_id = " + competencia_id;
+
+
+            connection.query(sql, function(err) {
+
+                if(err) return res.status(404).send("Hubo un error al intentar eliminar el voto");
+
+                const sql = "DELETE FROM competencia WHERE id = " + competencia_id;
+
+                connection.query(sql, function(err, deleteCompetencia) {
+
+                    if(err) return res.status(404).send("Hubo un error al intentar eliminar la competecia");
+
+                    res.send(JSON.stringify(deleteCompetencia));
+                });
+
+            });
+        });
+    },
+
+
+    
 }
 
 
