@@ -7,6 +7,7 @@ const controller = {
         const sql = "SELECT * FROM competencia";  
 
         connection.query(sql, function(err, results) {
+            
             if(err) {
                 console.log("Hubo un error en la consulta listarCompetencias", err.message);
                 return res.status(404).send("Hubo un error en la consulta listarCompetencias");
@@ -108,6 +109,7 @@ const controller = {
                         "LIMIT 3";
 
             connection.query(sql, function(err, peliculaResults) {
+
                 if(err) {
                     console.log("Error en la consulta de pelicula", err.message);
                     return res.status(404).send("Hubo un error en la consulta de peliculas resultados");
@@ -119,9 +121,7 @@ const controller = {
                 };
     
                 res.send(JSON.stringify(resultado));
-
-            });            
-
+            });
         });
     },
 
@@ -136,7 +136,6 @@ const controller = {
         const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
         const director_id = req.body.director !== '0' ? req.body.director : null;
         const actor_id    = req.body.actor    !== '0' ? req.body.actor    : null;
-
 
         const sql = "SELECT * FROM competencia where nombre = '" + nombre + "'"; 
         
@@ -169,7 +168,6 @@ const controller = {
                 }
                 
                 if(totalResults[0].totalResultados < 2) return res.status(422).send("No se puede crear la competencia. No hay al menos dos peliculas con el criterio elegido");
-
                 
                 const sql = "INSERT INTO competencia (nombre, genero_id, director_id, actor_id) VALUES (?,?,?,?);";
                 
@@ -178,7 +176,6 @@ const controller = {
                     
                     res.send(JSON.stringify(result));
                 });
-
             });
         });
     },
@@ -275,7 +272,6 @@ const controller = {
 
                     res.send(JSON.stringify(deleteCompetencia));
                 });
-
             });
         });
     },
