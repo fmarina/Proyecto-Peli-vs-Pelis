@@ -133,11 +133,12 @@ const controller = {
         if(!nombre) return res.status(422).send("Error. Debe ingresar un nombre de competencia");
         if(nombre.length < 3) return res.status(422).send("Error. El nombre de competencia debe ser mayor a 3 caracteres");
 
-        const sql = "SELECT * FROM competencia where nombre = '" + nombre + "'";   
-        
         const genero_id   = req.body.genero   !== '0' ? req.body.genero   : null;
         const director_id = req.body.director !== '0' ? req.body.director : null;
         const actor_id    = req.body.actor    !== '0' ? req.body.actor    : null;
+
+
+        const sql = "SELECT * FROM competencia where nombre = '" + nombre + "'"; 
         
         connection.query(sql, function(err, resultNombre) {
 
@@ -146,14 +147,13 @@ const controller = {
                 return res.status(404).send("Hubo un error en la consulta de competencias segun nombre");
             }
 
-            if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");
-            
+            if(resultNombre.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe");            
             
             let totalResultados = "SELECT count(*) as totalResultados " + 
-                                 "FROM pelicula " +
-                                 "JOIN director_pelicula ON pelicula_id = pelicula.id " +
-                                 "JOIN actor_pelicula ON actor_pelicula.pelicula_id = pelicula.id " +
-                                 "WHERE true = true";
+                                  "FROM pelicula " +
+                                  "JOIN director_pelicula ON pelicula_id = pelicula.id " +
+                                  "JOIN actor_pelicula ON actor_pelicula.pelicula_id = pelicula.id " +
+                                  "WHERE true = true";
             
             let genero   = genero_id   !== null ? " AND genero_id = "   + genero_id   : "";
             let director = director_id !== null ? " AND director_id = " + director_id : "";
@@ -263,7 +263,6 @@ const controller = {
 
             const sql = "DELETE FROM voto WHERE competencia_id = " + competencia_id;
 
-
             connection.query(sql, function(err) {
 
                 if(err) return res.status(404).send("Hubo un error al intentar eliminar el voto");
@@ -282,9 +281,43 @@ const controller = {
     },
 
 
-    
-}
+    editarNombreCompetencia: function(req, res) {
 
+        const competencia_id = req.params.id;
+        const nombreNuevo = req.body.nombre;
+
+        if(!nombreNuevo) return res.status(422).send("Error. Debe ingresar un nombre de competencia");
+        if(nombreNuevo.length < 3) return res.status(422).send("Error. El nombre de competencia debe ser mayor a 3 caracteres"); 
+
+        const sql = "SELECT * FROM competencia WHERE id = " + competencia_id;        
+
+        connection.query(sql, function(err, result) {
+
+            if(err) return res.status(404).send("Hubo un error en la consulta de competencia segun id");
+
+            if(result.length === 0) return res.status(404).send("No se encontró ninguna competencia con ese id");
+
+            const sql = "SELECT * FROM competencia WHERE nombre = '" + nombreNuevo + "'";
+
+            connection.query(sql, function (err, resultByName) {
+
+                if(err) return res.status(404).send("Hubo un error en la consulta de competencia segun el nombre");
+                
+                if(resultByName.length === 1) return res.status(422).send("Error. Ese nombre de competencia ya existe"); 
+
+                const sql = "UPDATE competencia " + "SET nombre = '" + nombreNuevo + "' WHERE id = " + competencia_id;
+
+                connection.query(sql, function(err, resultEdition) {
+
+                    if(err) return res.status(404).send("Hubo un error al intentar editar el nombre de competencia");
+
+                    res.send(JSON.stringify(resultEdition));
+                });
+            });
+        });    
+    }
+
+}
 
 
 module.exports = controller;
