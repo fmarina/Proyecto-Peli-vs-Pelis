@@ -223,8 +223,8 @@ const controller = {
         const sql = "SELECT * FROM director;"
         connection.query(sql, function(err, results) {
             if(err) {
-                console.log("Error en la consulta generos", err.message);
-                return res.status(404).send("Hubo un error en la consulta generos");
+                console.log("Error en la consulta director", err.message);
+                return res.status(404).send("Hubo un error en la consulta director");
             }
 
             res.send(JSON.stringify(results));
@@ -232,7 +232,20 @@ const controller = {
     },
 
 
+    cargarActores: function(req, res) {
+        const sql = "SELECT * FROM actor;";
+        connection.query(sql, function(err, results) {
+            if(err) {
+                console.log("Error en la consulta actores", err.message);
+                return res.status(404).send("Hubo un error en la consulta actores");
+            }
 
+            res.send(JSON.stringify(results));
+        });
+    }
+
+
+    
 }
 
 
