@@ -11,4 +11,5 @@ module.exports = function(app){
     app.post('/competencias', competenciaController.crearNuevaCompetencia);
     app.delete('/competencias/:id/votos', competenciaController.eliminarVotos); 
     app.delete('/competencias/:id', competenciaController.eliminarCompetencia);   
+    app.put('/competencias/:id', competenciaController.editarNombreCompetencia);
 }
