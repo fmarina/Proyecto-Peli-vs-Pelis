@@ -20,7 +20,7 @@ const controller = {
     obtenerPeliculasAleatorias: function(req, res){
 
         const competencia_id = req.params.id;
-        const sql = "SELECT nombre, genero_id FROM competencia WHERE id = " + competencia_id;
+        const sql = "SELECT nombre, genero_id, director_id FROM competencia WHERE id = " + competencia_id;
 
         connection.query(sql, function(err, competenciaResult) {      
 
@@ -31,14 +31,19 @@ const controller = {
                 return res.status(404).send("No se encontro ninguna competencia con ese id");
             } 
             
-            let sql = "SELECT id, poster, titulo FROM pelicula "
+            let sql = "SELECT pelicula.id, poster, titulo FROM pelicula " +
+                      "JOIN director_pelicula ON pelicula_id = pelicula.id " +
+                      "WHERE true = true ";
             
-            let genero_id = competenciaResult[0].genero_id;
-            let genero = genero_id ? " WHERE genero_id = " + genero_id : ""; 
+            let genero_id   = competenciaResult[0].genero_id;
+            let director_id = competenciaResult[0].director_id;
+            
+            let genero   = genero_id   ? " AND genero_id = "   + genero_id   : ""; 
+            let director = director_id ? " AND director_id = " + director_id : "";
             
             let orderBy = " ORDER BY RAND() LIMIT 2;";
 
-            sql = sql + genero + orderBy
+            sql = sql + genero + director + orderBy;
             console.log(sql);
 
             connection.query(sql, function(err, peliculaResult) {
