@@ -315,6 +315,37 @@ const controller = {
                 });
             });
         });    
+    },
+
+
+    cargarCompetencia: function(req, res) {
+
+        const competencia_id = req.params.id;
+
+        const sql = "SELECT competencia.nombre AS nombreCompetencia, genero.nombre AS genero, " + 
+                    "director.nombre AS director, actor.nombre AS actor " + 
+                    "FROM competencia " +
+                    "LEFT JOIN genero ON competencia.genero_id = genero.id " + 
+                    "LEFT JOIN director ON competencia.director_id = director.id " +
+                    "LEFT JOIN actor ON competencia.actor_id = actor.id " + 
+                    "WHERE competencia.id = " + competencia_id;
+
+        connection.query(sql, function(err, results) {
+            
+            if(err) {
+                console.log("Error en la consulta de cargar competencia", err.message);
+                return res.status(404).send("Hubo un error en la consulta al cargar competencia");
+            }
+
+            const resultado = {
+                'nombre'          : results[0].nombreCompetencia,
+                'genero_nombre'   : results[0].genero,
+                'director_nombre' : results[0].director,
+                'actor_nombre'    : results[0].actor
+            }
+
+            res.send(JSON.stringify(resultado));
+        });        
     }
 
 }
