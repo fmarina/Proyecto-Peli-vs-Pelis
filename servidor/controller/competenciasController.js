@@ -50,6 +50,7 @@ const controller = {
             sql = sql + genero + director + actor + orderBy;
 
             connection.query(sql, function(err, peliculaResult) {
+                
                 if(err) return res.status(404).send("Hubo un error en la consulta obtenerPeliculasAleatorias");
 
                 const result = {
@@ -70,7 +71,7 @@ const controller = {
 
         const sql = "INSERT INTO voto (competencia_id, pelicula_id) VALUES (?,?)";
 
-        if(!pelicula_id) return res.status(404).send("Hubo un error con pelicula_id");
+        if(!pelicula_id) return res.status(422).send("Hubo un error con pelicula_id");
 
         connection.query(sql, [competencia_id, pelicula_id], function(err, results) {            
             
@@ -198,7 +199,7 @@ const controller = {
             const sql = "DELETE FROM voto WHERE competencia_id = " + competencia_id;
 
             connection.query(sql, function(err, deleteResult) {
-                if(err) return res.status(404).send("Hubo un error al intentar eliminar los votos de una competencia");
+                if(err) return res.status(500).send("Hubo un error al intentar eliminar los votos de una competencia");
 
                 res.send(JSON.stringify(deleteResult));
             });
@@ -262,13 +263,13 @@ const controller = {
 
             connection.query(sql, function(err) {
 
-                if(err) return res.status(404).send("Hubo un error al intentar eliminar el voto");
+                if(err) return res.status(500).send("Hubo un error al intentar eliminar el voto");
 
                 const sql = "DELETE FROM competencia WHERE id = " + competencia_id;
 
                 connection.query(sql, function(err, deleteCompetencia) {
 
-                    if(err) return res.status(404).send("Hubo un error al intentar eliminar la competecia");
+                    if(err) return res.status(500).send("Hubo un error al intentar eliminar la competecia");
 
                     res.send(JSON.stringify(deleteCompetencia));
                 });
@@ -305,7 +306,7 @@ const controller = {
 
                 connection.query(sql, function(err, resultEdition) {
 
-                    if(err) return res.status(404).send("Hubo un error al intentar editar el nombre de competencia");
+                    if(err) return res.status(500).send("Hubo un error al intentar editar el nombre de competencia");
 
                     res.send(JSON.stringify(resultEdition));
                 });
