@@ -78,7 +78,7 @@ const controller = {
                 return res.status(404).send("Hubo un error al tratar de insertar el voto");
             } 
 
-            res.send(JSON.stringify(results));
+            res.send(JSON.stringify(results));            
         }); 
     },
 
